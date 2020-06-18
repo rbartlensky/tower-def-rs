@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.2" tiledversion="1.3.4" orientation="orthogonal" renderorder="right-down" width="25" height="25" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="1">
+ <tileset firstgid="1" name="tile-set" tilewidth="16" tileheight="16" tilecount="364" columns="7">
+  <image source="tile-set.png" width="112" height="832"/>
+  <tile id="6">
+   <properties>
+    <property name="start-point" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="23">
+   <properties>
+    <property name="tower" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="61">
+   <properties>
+    <property name="end-point" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="63">
+   <properties>
+    <property name="down" type="bool" value="true"/>
+    <property name="left" type="bool" value="false"/>
+    <property name="right" type="bool" value="true"/>
+    <property name="road" type="bool" value="true"/>
+    <property name="up" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="64">
+   <properties>
+    <property name="down" type="bool" value="true"/>
+    <property name="left" type="bool" value="true"/>
+    <property name="right" type="bool" value="false"/>
+    <property name="road" type="bool" value="true"/>
+    <property name="up" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="65">
+   <properties>
+    <property name="down" type="bool" value="false"/>
+    <property name="left" type="bool" value="true"/>
+    <property name="right" type="bool" value="true"/>
+    <property name="road" type="bool" value="true"/>
+    <property name="up" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="66">
+   <properties>
+    <property name="down" type="bool" value="true"/>
+    <property name="left" type="bool" value="true"/>
+    <property name="right" type="bool" value="true"/>
+    <property name="road" type="bool" value="true"/>
+    <property name="up" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="67">
+   <properties>
+    <property name="road" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="68">
+   <properties>
+    <property name="road" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="70">
+   <properties>
+    <property name="down" type="bool" value="true"/>
+    <property name="left" type="bool" value="false"/>
+    <property name="right" type="bool" value="true"/>
+    <property name="road" type="bool" value="true"/>
+    <property name="up" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="71">
+   <properties>
+    <property name="down" type="bool" value="false"/>
+    <property name="left" type="bool" value="true"/>
+    <property name="right" type="bool" value="true"/>
+    <property name="road" type="bool" value="true"/>
+    <property name="up" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="72">
+   <properties>
+    <property name="down" type="bool" value="true"/>
+    <property name="left" type="bool" value="true"/>
+    <property name="right" type="bool" value="false"/>
+    <property name="road" type="bool" value="true"/>
+    <property name="up" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="73">
+   <properties>
+    <property name="road" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="74">
+   <properties>
+    <property name="road" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="75">
+   <properties>
+    <property name="road" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="77">
+   <properties>
+    <property name="down" type="bool" value="true"/>
+    <property name="left" type="bool" value="false"/>
+    <property name="right" type="bool" value="false"/>
+    <property name="road" type="bool" value="true"/>
+    <property name="up" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="78">
+   <properties>
+    <property name="down" type="bool" value="true"/>
+    <property name="left" type="bool" value="true"/>
+    <property name="right" type="bool" value="true"/>
+    <property name="road" type="bool" value="true"/>
+    <property name="up" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="79">
+   <properties>
+    <property name="down" type="bool" value="true"/>
+    <property name="left" type="bool" value="false"/>
+    <property name="right" type="bool" value="false"/>
+    <property name="road" type="bool" value="true"/>
+    <property name="up" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="80">
+   <properties>
+    <property name="road" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="81">
+   <properties>
+    <property name="road" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="82">
+   <properties>
+    <property name="road" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="84">
+   <properties>
+    <property name="down" type="bool" value="false"/>
+    <property name="left" type="bool" value="false"/>
+    <property name="right" type="bool" value="true"/>
+    <property name="road" type="bool" value="true"/>
+    <property name="up" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="85">
+   <properties>
+    <property name="down" type="bool" value="false"/>
+    <property name="left" type="bool" value="true"/>
+    <property name="right" type="bool" value="true"/>
+    <property name="road" type="bool" value="true"/>
+    <property name="up" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="86">
+   <properties>
+    <property name="down" type="bool" value="false"/>
+    <property name="left" type="bool" value="true"/>
+    <property name="right" type="bool" value="false"/>
+    <property name="road" type="bool" value="true"/>
+    <property name="up" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="87">
+   <properties>
+    <property name="road" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="88">
+   <properties>
+    <property name="road" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="89">
+   <properties>
+    <property name="road" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="112">
+   <properties>
+    <property name="runner" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="207">
+   <properties>
+    <property name="construction-point" type="bool" value="true"/>
+   </properties>
+  </tile>
+ </tileset>
+ <layer id="4" name="Tile Layer 2" width="25" height="25" locked="1">
+  <data encoding="csv">
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+</data>
+ </layer>
+ <layer id="1" name="Tile Layer 1" width="25" height="25">
+  <properties>
+   <property name="road" type="bool" value="false"/>
+  </properties>
+  <data encoding="csv">
+227,3,256,1,1,1,1,3,1,1,1,1,16,16,1,1,1,1,10,1,1,1,1,13,13,
+227,1,1,3,258,220,235,235,235,235,235,235,54,55,235,235,235,235,221,235,235,235,235,13,13,
+227,1,1,1,1,227,1,1,1,1,1,1,61,62,1,1,1,1,1,1,1,1,1,5,5,
+227,1,259,1,1,227,1,1,1,1,1,208,71,65,208,1,1,1,1,1,1,1,1,5,5,
+227,1,1,1,1,227,1,37,1,1,1,1,78,64,72,72,72,73,1,13,1,1,1,5,5,
+234,235,235,235,235,236,1,1,1,1,1,1,78,78,208,1,1,85,72,72,73,1,1,5,5,
+1,1,1,1,1,1,1,1,13,71,72,72,87,64,73,1,1,1,1,208,80,1,1,1,1,
+1,1,1,1,1,1,1,1,1,80,208,1,1,13,78,1,1,1,1,1,80,1,1,1,1,
+1,1,1,21,1,1,1,1,1,80,1,0,1,13,78,1,1,1,1,1,80,13,1,1,1,
+1,1,1,1,1,1,1,1,1,80,1,1,1,1,78,1,1,1,1,1,80,1,1,1,1,
+1,1,1,1,1,1,1,1,1,80,1,1,1,1,78,1,1,1,1,208,80,1,1,1,1,
+1,1,1,1,1,1,1,1,1,80,1,1,1,3,78,1,1,1,1,1,80,1,1,1,1,
+13,1,1,1,1,1,1,1,1,80,1,1,1,3,78,1,1,1,1,1,80,1,1,1,1,
+13,1,1,1,1,1,1,1,1,80,1,1,71,72,66,73,0,0,0,0,80,0,1,0,0,
+1,1,1,1,1,1,1,1,1,80,1,0,80,3,1,80,1,1,0,0,80,0,1,0,0,
+1,1,1,1,1,1,1,1,1,85,72,72,65,3,13,80,1,1,0,0,80,0,1,1,0,
+1,1,1,1,1,1,1,1,1,1,1,0,80,3,1,80,1,1,0,0,80,0,1,1,0,
+1,1,21,1,1,1,1,1,1,1,1,0,80,3,1,80,1,1,0,208,80,0,0,0,0,
+1,1,1,1,1,1,1,1,1,1,1,0,78,3,1,80,1,1,1,1,80,0,0,1,1,
+1,1,1,1,1,13,1,1,1,1,1,0,80,3,1,80,1,1,1,1,80,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,0,80,3,3,80,208,1,1,1,80,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,64,72,72,79,86,86,86,86,87,1,1,21,1,
+1,1,1,1,1,1,1,1,1,1,1,1,64,72,72,87,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,80,3,1,1,1,1,1,1,1,1,1,1,1,
+5,5,5,5,5,5,5,5,5,5,5,5,7,5,5,5,5,5,5,5,5,5,5,5,5
+</data>
+ </layer>
+</map>
