@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This is my attempt at creating a tower defence game in Rust using the Amethyst
+This is my attempt at creating a tower defense game in Rust using the Amethyst
 game engine.
 
 ### Implemented so far
