@@ -20,8 +20,8 @@ game engine.
 * Smart runners (runners that do interesting stuff)
 
 ## Images
-![](https://raw.githubusercontent.com/rbartlensky/tower-def/master/td1.png)
-![](https://raw.githubusercontent.com/rbartlensky/tower-def/master/td2.png)
+![](https://raw.githubusercontent.com/rbartlensky/tower-def-rs/master/td1.png)
+![](https://raw.githubusercontent.com/rbartlensky/tower-def-rs/master/td2.png)
 
 ## How to run
 
