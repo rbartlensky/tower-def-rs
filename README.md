@@ -15,7 +15,7 @@ game engine.
 
 * Menus
 * Level selector
-* Tower selector
+* Tower selector (mostly implemented, but very basic)
 * Tower upgrades + effects (buffs, debuffs)
 * Smart runners (runners that do interesting stuff)
 

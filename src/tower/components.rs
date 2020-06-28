@@ -25,6 +25,13 @@ impl TowerKind {
             TowerKind::Frost => 15.0,
         }
     }
+
+    pub fn sprite_number(&self) -> usize {
+        match self {
+            TowerKind::Simple => 23,
+            TowerKind::Frost => 24,
+        }
+    }
 }
 
 pub struct Tower {
@@ -60,6 +67,10 @@ impl Tower {
 
     pub fn set_cd(&mut self, cd: f32) {
         self.cd = cd;
+    }
+
+    pub fn sprite_number(&self) -> usize {
+        self.kind.sprite_number()
     }
 }
 

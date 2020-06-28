@@ -1,4 +1,4 @@
-use amethyst::{core::transform::Transform, prelude::*, renderer::Camera};
+use amethyst::core::transform::Transform;
 
 mod map;
 pub mod runner;

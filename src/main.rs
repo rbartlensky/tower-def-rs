@@ -33,7 +33,7 @@ fn main() -> amethyst::Result<()> {
         .with(tower_def::tower::TowerSystem, "tower_sytem", &[])
         .with(tower_def::tower::MissleSystem, "missle_sytem", &[])
         .with(
-            tower_def::tower::BuildPointSystem,
+            tower_def::tower::BuildPointSystem::new(),
             "build_point_system",
             &["input_system"],
         )

@@ -1,7 +1,5 @@
 use amethyst::{
-    assets::Loader,
     core::transform::Transform,
-    ecs::Entity,
     prelude::*,
     renderer::{Camera, SpriteRender},
 };
