@@ -50,7 +50,7 @@ impl<'s> System<'s> for TowerSystem {
                 sprite_sheet: map.sprite_sheet_handle(),
                 sprite_number: 143,
             };
-            trans.move_backward(10.0);
+            trans.translation_mut().z = 0.5;
             entities
                 .build_entity()
                 .with(missle, &mut missles)
@@ -79,7 +79,17 @@ impl<'s> System<'s> for BuildPointSystem {
 
     fn run(
         &mut self,
-        (mut transforms, points, input, dim, camera, entities, mut towers, mut sprites, map): Self::SystemData,
+        (
+            mut transforms,
+            points,
+            input,
+            dim,
+            camera,
+            entities,
+            mut towers,
+            mut sprites,
+            map,
+        ): Self::SystemData,
     ) {
         let map = (&map).join().next().unwrap();
         if input.mouse_button_is_down(amethyst::winit::MouseButton::Left) {
@@ -102,7 +112,7 @@ impl<'s> System<'s> for BuildPointSystem {
                 for (ent, bp, trans) in (&entities, &points, &transforms).join() {
                     if utils::in_range(trans, (map.tile_width() / 2) as f32, &mouse_trans) {
                         let mut trans = trans.clone();
-                        trans.move_backward(10.0);
+                        trans.translation_mut().z = 0.5;
                         tower = Some((trans, bp.pos()));
                         entities.delete(ent).unwrap();
                         break;

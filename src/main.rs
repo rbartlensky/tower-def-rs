@@ -9,6 +9,7 @@ use amethyst::{
         types::DefaultBackend,
         RenderingBundle,
     },
+    ui::{RenderUi, UiBundle},
     utils::application_root_dir,
 };
 
@@ -24,15 +25,9 @@ fn main() -> amethyst::Result<()> {
     let input_bundle = InputBundle::<StringBindings>::new();
 
     let game_data = GameDataBuilder::default()
-        .with_bundle(
-            RenderingBundle::<DefaultBackend>::new()
-                .with_plugin(
-                    RenderToWindow::from_config_path(display_config_path)?
-                        .with_clear([0.34, 0.36, 0.52, 1.0]),
-                )
-                .with_plugin(RenderFlat2D::default()),
-        )?
+        .with_bundle(TransformBundle::new())?
         .with_bundle(input_bundle)?
+        .with_bundle(UiBundle::<StringBindings>::new())?
         .with(tower_def::runner::RunnerSystem, "runner_sytem", &[])
         .with(tower_def::runner::SpawnSystem::new(), "spawn_system", &[])
         .with(tower_def::tower::TowerSystem, "tower_sytem", &[])
@@ -42,7 +37,15 @@ fn main() -> amethyst::Result<()> {
             "build_point_system",
             &["input_system"],
         )
-        .with_bundle(TransformBundle::new())?;
+        .with_bundle(
+            RenderingBundle::<DefaultBackend>::new()
+                .with_plugin(
+                    RenderToWindow::from_config_path(display_config_path)?
+                        .with_clear([0.34, 0.36, 0.52, 1.0]),
+                )
+                .with_plugin(RenderFlat2D::default())
+                .with_plugin(RenderUi::default()),
+        )?;
 
     let mut game = Application::new(assets_dir, TowerDefState {}, game_data)?;
     game.run();

@@ -6,20 +6,6 @@ pub mod states;
 pub mod tower;
 pub use states::TowerDefState;
 
-pub const MAP_HEIGHT: usize = 700;
-pub const MAP_WIDTH: usize = 700;
-
-fn initialise_camera(world: &mut World) {
-    let mut transform = Transform::default();
-
-    transform.set_translation_xyz((MAP_WIDTH / 2) as f32, (MAP_HEIGHT / 2) as f32, 100.0);
-    world
-        .create_entity()
-        .with(Camera::standard_2d(MAP_WIDTH as f32, MAP_HEIGHT as f32))
-        .with(transform)
-        .build();
-}
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Coord {
     pub x: usize,
@@ -38,7 +24,7 @@ impl Coord {
         pos.set_translation_xyz(
             (self.x * tile_w) as f32 + offset_x,
             (self.y * tile_h) as f32 + offset_y,
-            1.1,
+            0.0,
         );
         pos
     }

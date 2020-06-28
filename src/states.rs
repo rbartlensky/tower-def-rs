@@ -1,20 +1,43 @@
-use amethyst::{core::transform::Transform, prelude::*, renderer::SpriteRender};
+use amethyst::{
+    assets::Loader,
+    core::transform::Transform,
+    ecs::Entity,
+    prelude::*,
+    renderer::{Camera, SpriteRender},
+};
 
 use std::collections::HashMap;
 
-use super::{initialise_camera, map, Coord};
-use crate::{map::Map, tower::BuildPoint};
+use super::Coord;
+use crate::{
+    map::{self, Map},
+    tower::BuildPoint,
+};
 
 #[derive(Default)]
 pub struct TowerDefState {}
 
 impl TowerDefState {
+    fn initialise_camera(&mut self, world: &mut World, map: &tiled::Map) {
+        let mut transform = Transform::default();
+        let width = (map.width * map.tile_width) as f32;
+        let height = (map.height * map.tile_height) as f32;
+
+        transform.set_translation_xyz(width / 2., height / 2., 1.0);
+        world
+            .create_entity()
+            .with(Camera::standard_2d(width, height))
+            .with(transform)
+            .build();
+    }
+
     fn load_map(&mut self, world: &mut World) {
         // parse the map
         let map_file = std::fs::File::open("assets/tower-def.tmx").unwrap();
         let reader = std::io::BufReader::new(map_file);
         let map = tiled::parse(reader).unwrap();
         let tile_set = map.get_tileset_by_gid(1).unwrap();
+        self.initialise_camera(world, &map);
 
         let sprite_sheets = map::create_sprite_sheets(tile_set, world);
         let sprite_sheet_handle = &sprite_sheets[0];
@@ -99,11 +122,14 @@ impl TowerDefState {
                     tile_transform.set_translation_xyz(
                         offset_x + x_coord as f32,
                         offset_y + y_coord as f32,
-                        1.0,
+                        -1.0,
                     );
 
                     // Create the tile entity
-                    let entity = world.create_entity().with(tile_transform).with(tile_sprite);
+                    let entity = world
+                        .create_entity()
+                        .with(tile_transform)
+                        .with(tile_sprite.clone());
                     // if it is a build point, make sure to add that component as well
                     if construction_points.binary_search(&tile_id).is_ok() {
                         entity.with(BuildPoint::new(Coord::new(x, y)))
@@ -126,7 +152,6 @@ impl SimpleState for TowerDefState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
         self.load_map(world);
-        initialise_camera(world);
     }
 }
 
