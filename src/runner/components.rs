@@ -1,9 +1,13 @@
 use amethyst::ecs::prelude::{Component, DenseVecStorage};
 
+use crate::tower::Debuff;
+
 pub struct Runner {
     road: usize,
     pos: usize,
     hp: f32,
+    speed: f32,
+    debuffs: Vec<Debuff>,
 }
 
 impl Runner {
@@ -11,7 +15,9 @@ impl Runner {
         Self {
             road,
             pos,
-            hp: 40.0,
+            hp: 100.0,
+            speed: 32.0,
+            debuffs: vec![],
         }
     }
 
@@ -33,6 +39,37 @@ impl Runner {
 
     pub fn deal_damage(&mut self, damage: f32) {
         self.hp -= damage;
+    }
+
+    pub fn speed(&self) -> f32 {
+        self.speed
+    }
+
+    pub fn set_speed(&mut self, speed: f32) {
+        self.speed = speed;
+    }
+
+    pub fn apply_debuff(&mut self, debuff: Option<Debuff>) {
+        if let Some(mut debuff) = debuff {
+            debuff.start(self);
+            self.debuffs.push(debuff);
+        }
+    }
+
+    pub fn tick(&mut self, duration: f32) {
+        let (not_done, done): (Vec<Debuff>, Vec<Debuff>) = self
+            .debuffs
+            .drain(..)
+            .into_iter()
+            .map(|mut d| {
+                d.tick(duration);
+                d
+            })
+            .partition(|d| d.duration() > 0.);
+        self.debuffs = not_done;
+        for mut debuff in done {
+            debuff.end(self);
+        }
     }
 }
 

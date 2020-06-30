@@ -9,15 +9,24 @@ game engine.
 
 * Runners choose a random path towards the castle
 * Towers shoot on sight and deal damage (if a runner is hit twice, it dies)
-* If you click on the X sprites, you create a tower (a default one for now)
+* Simple tower selector when you click on "X" tiles.
+* Debuffs (when frost tower hits enemy it is slowed down)
 
 ### To be implemented
 
 * Menus
 * Level selector
-* Tower selector (mostly implemented, but very basic)
-* Tower upgrades + effects (buffs, debuffs)
+* Tower upgrades + tower buffs
 * Smart runners (runners that do interesting stuff)
+
+### To improve
+
+* Make missles move at a constant speed towards the target. (My calculations
+are wrong when I decide how much to append to the missle's transform)
+* Tower selector (very basic atm, would like to add some sort-of border around
+items in the selector)
+* Debuffs (maybe implementing a trait is better than having closures?)
+
 
 ## Images
 ![](https://raw.githubusercontent.com/rbartlensky/tower-def-rs/master/td1.png)

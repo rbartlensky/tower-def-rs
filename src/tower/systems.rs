@@ -37,7 +37,8 @@ impl<'s> System<'s> for TowerSystem {
             tower.set_cd(tower.cd() + time);
             for (_, r_trans, ent) in (&runners, &transforms, &entities).join() {
                 if utils::in_range(&t_trans, tower.radius(), &r_trans) && tower.cd() >= 1.0 {
-                    missle_comps.push((Missle::new(ent.id(), tower.damage()), t_trans.clone()));
+                    let debuff = tower.debuff();
+                    missle_comps.push((Missle::new(ent.id(), tower.damage(), debuff), t_trans.clone()));
                     tower.set_cd(0.0);
                 }
             }
@@ -206,9 +207,12 @@ impl<'s> System<'s> for MissleSystem {
         Entities<'s>,
     );
 
-    fn run(&mut self, (mut transforms, mut runners, missles, time, entities): Self::SystemData) {
+    fn run(
+        &mut self,
+        (mut transforms, mut runners, mut missles, time, entities): Self::SystemData,
+    ) {
         let time = time.delta_seconds();
-        for (missle, ent) in (&missles, &entities).join() {
+        for (missle, ent) in (&mut missles, &entities).join() {
             let target_ent = entities.entity(missle.target());
             let (mut norm, is_close) = {
                 let target_tr = if let Some(trans) = transforms.get(target_ent) {
@@ -233,13 +237,14 @@ impl<'s> System<'s> for MissleSystem {
                     continue;
                 };
                 runner.deal_damage(missle.damage());
+                runner.apply_debuff(missle.debuff());
                 entities.delete(ent).unwrap();
                 if runner.hp() <= 0.0 {
                     entities.delete(target_ent).unwrap();
                 }
             } else {
-                norm.x += time * MISSLE_SPEED;
-                norm.y += time * MISSLE_SPEED;
+                norm.x *= time * MISSLE_SPEED;
+                norm.y *= time * MISSLE_SPEED;
                 transforms.get_mut(ent).unwrap().append_translation(norm);
             }
         }

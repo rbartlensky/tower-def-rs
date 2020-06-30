@@ -23,6 +23,7 @@ impl<'s> System<'s> for RunnerSystem {
         let road = map.road();
         let time = time.delta_seconds();
         for (runner, transform, ent) in (&mut runners, &mut transforms, &entities).join() {
+            runner.tick(time);
             let road = &road[runner.road()];
             let runner_pos = runner.pos();
             let next_pos = road.get(runner_pos + 1);
@@ -33,9 +34,9 @@ impl<'s> System<'s> for RunnerSystem {
                 if utils::in_range(transform, 1.0, &target_trans) {
                     runner.set_pos(runner_pos + 1);
                 } else {
-                    norm.x += time;
-                    norm.y += time;
-                    transform.prepend_translation(norm);
+                    norm.x *= time * runner.speed();
+                    norm.y *= time * runner.speed();
+                    transform.append_translation(norm);
                 }
             } else {
                 // we have reached the end!
