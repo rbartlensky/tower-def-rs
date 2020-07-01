@@ -1,7 +1,9 @@
 use amethyst::{
+    assets::Loader,
     core::transform::Transform,
     prelude::*,
     renderer::{Camera, SpriteRender},
+    ui::{Anchor, TtfFormat, UiText, UiTransform},
 };
 
 use std::collections::HashMap;
@@ -142,6 +144,32 @@ impl TowerDefState {
         world
             .create_entity()
             .with(Map::new(map, paths, sprite_sheet_handle.clone()))
+            .build();
+        // create the text which lets you know how many resources you have left
+        let font = world.read_resource::<Loader>().load(
+            "font/square.ttf",
+            TtfFormat,
+            (),
+            &world.read_resource(),
+        );
+        world
+            .create_entity()
+            .with(UiTransform::new(
+                "gold-text".to_string(),
+                Anchor::TopLeft,
+                Anchor::TopLeft,
+                50.,
+                -50.,
+                0.0,
+                200.,
+                50.,
+            ))
+            .with(UiText::new(
+                font.clone(),
+                "100 gold".to_string(),
+                [1., 1., 1., 1.],
+                50.,
+            ))
             .build();
     }
 }

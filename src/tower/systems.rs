@@ -6,6 +6,7 @@ use amethyst::ecs::{
 };
 use amethyst::input::{InputHandler, StringBindings};
 use amethyst::renderer::{Camera, SpriteRender};
+use amethyst::ui::UiText;
 use amethyst::window::ScreenDimensions;
 
 use crate::tower::{utils, BuildPoint, Missle, Tower, TowerKind, MISSLE_SPEED};
@@ -38,7 +39,10 @@ impl<'s> System<'s> for TowerSystem {
             for (_, r_trans, ent) in (&runners, &transforms, &entities).join() {
                 if utils::in_range(&t_trans, tower.radius(), &r_trans) && tower.cd() >= 1.0 {
                     let debuff = tower.debuff();
-                    missle_comps.push((Missle::new(ent.id(), tower.damage(), debuff), t_trans.clone()));
+                    missle_comps.push((
+                        Missle::new(ent.id(), tower.damage(), debuff),
+                        t_trans.clone(),
+                    ));
                     tower.set_cd(0.0);
                 }
             }
@@ -200,17 +204,20 @@ pub struct MissleSystem;
 
 impl<'s> System<'s> for MissleSystem {
     type SystemData = (
+        WriteStorage<'s, Map>,
         WriteStorage<'s, Transform>,
         WriteStorage<'s, Runner>,
         WriteStorage<'s, Missle>,
         Read<'s, Time>,
+        WriteStorage<'s, UiText>,
         Entities<'s>,
     );
 
     fn run(
         &mut self,
-        (mut transforms, mut runners, mut missles, time, entities): Self::SystemData,
+        (mut map, mut transforms, mut runners, mut missles, time, mut texts, entities): Self::SystemData,
     ) {
+        let map = (&mut map).join().next().unwrap();
         let time = time.delta_seconds();
         for (missle, ent) in (&mut missles, &entities).join() {
             let target_ent = entities.entity(missle.target());
@@ -240,7 +247,10 @@ impl<'s> System<'s> for MissleSystem {
                 runner.apply_debuff(missle.debuff());
                 entities.delete(ent).unwrap();
                 if runner.hp() <= 0.0 {
+                    map.add_gold(runner.bounty());
                     entities.delete(target_ent).unwrap();
+                    // update labels as well
+                    (&mut texts).join().next().unwrap().text = format!("{} gold", map.gold());
                 }
             } else {
                 norm.x *= time * MISSLE_SPEED;

@@ -8,6 +8,7 @@ pub struct Runner {
     hp: f32,
     speed: f32,
     debuffs: Vec<Debuff>,
+    bounty: usize,
 }
 
 impl Runner {
@@ -18,6 +19,7 @@ impl Runner {
             hp: 100.0,
             speed: 32.0,
             debuffs: vec![],
+            bounty: 50,
         }
     }
 
@@ -70,6 +72,10 @@ impl Runner {
         for mut debuff in done {
             debuff.end(self);
         }
+    }
+
+    pub fn bounty(&self) -> usize {
+        self.bounty
     }
 }
 

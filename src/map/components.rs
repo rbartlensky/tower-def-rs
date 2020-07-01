@@ -7,6 +7,7 @@ pub struct Map {
     tiled_map: tiled::Map,
     road: Vec<Vec<Coord>>,
     sprite_sheet_handle: Handle<SpriteSheet>,
+    gold: usize,
 }
 
 impl Map {
@@ -19,6 +20,7 @@ impl Map {
             tiled_map,
             road,
             sprite_sheet_handle,
+            gold: 100,
         }
     }
 
@@ -36,6 +38,14 @@ impl Map {
 
     pub fn sprite_sheet_handle(&self) -> Handle<SpriteSheet> {
         self.sprite_sheet_handle.clone()
+    }
+
+    pub fn gold(&self) -> usize {
+        self.gold
+    }
+
+    pub fn add_gold(&mut self, gold: usize) {
+        self.gold += gold;
     }
 }
 
