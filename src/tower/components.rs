@@ -4,10 +4,11 @@ use crate::{runner::Runner, Coord};
 
 pub const MISSLE_SPEED: f32 = 64.0;
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[repr(u8)]
 pub enum TowerKind {
     Simple,
+    Turret,
     Frost,
 }
 
@@ -15,6 +16,7 @@ impl TowerKind {
     pub fn radius(&self) -> f32 {
         match self {
             TowerKind::Simple => 30.0,
+            TowerKind::Turret => 30.0,
             TowerKind::Frost => 20.0,
         }
     }
@@ -22,14 +24,40 @@ impl TowerKind {
     pub fn damage(&self) -> f32 {
         match self {
             TowerKind::Simple => 20.0,
+            TowerKind::Turret => 15.0,
             TowerKind::Frost => 10.0,
         }
     }
 
     pub fn sprite_number(&self) -> usize {
         match self {
-            TowerKind::Simple => 23,
+            TowerKind::Simple => 22,
+            TowerKind::Turret => 23,
             TowerKind::Frost => 24,
+        }
+    }
+
+    pub fn cost(&self) -> usize {
+        match self {
+            TowerKind::Simple => 50,
+            TowerKind::Turret => 100,
+            TowerKind::Frost => 75,
+        }
+    }
+
+    pub fn speed(&self) -> f32 {
+        match self {
+            TowerKind::Simple => 1.0,
+            TowerKind::Turret => 0.4,
+            TowerKind::Frost => 1.0,
+        }
+    }
+
+    pub fn upgrades(&self) -> Vec<TowerKind> {
+        match self {
+            TowerKind::Simple => vec![TowerKind::Turret],
+            TowerKind::Turret => vec![],
+            TowerKind::Frost => vec![],
         }
     }
 }
@@ -42,7 +70,7 @@ pub struct Tower {
 
 impl Tower {
     pub fn new(kind: TowerKind, pos: Coord) -> Tower {
-        Tower { kind, pos, cd: 1.0 }
+        Tower { kind, pos, cd: 0. }
     }
 
     pub fn radius(&self) -> f32 {
@@ -65,8 +93,8 @@ impl Tower {
         self.cd
     }
 
-    pub fn set_cd(&mut self, cd: f32) {
-        self.cd = cd;
+    pub fn reset_cd(&mut self) {
+        self.cd = self.kind.speed();
     }
 
     pub fn sprite_number(&self) -> usize {
@@ -83,6 +111,18 @@ impl Tower {
                 Box::new(|r| r.set_speed(r.speed() * 2.)),
             ))
         }
+    }
+
+    pub fn cost(&self) -> usize {
+        self.kind.cost()
+    }
+
+    pub fn tick(&mut self, delta: f32) {
+        self.cd -= delta;
+    }
+
+    pub fn upgrades(&self) -> Vec<TowerKind> {
+        self.kind.upgrades()
     }
 }
 
@@ -101,6 +141,10 @@ impl BuildPoint {
 
     pub fn pos(&self) -> Coord {
         self.pos
+    }
+
+    pub const fn upgrades(&self) -> [TowerKind; 2] {
+        [TowerKind::Simple, TowerKind::Frost]
     }
 }
 

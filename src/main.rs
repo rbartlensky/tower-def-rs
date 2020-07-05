@@ -32,6 +32,7 @@ fn main() -> amethyst::Result<()> {
         .with(tower_def::runner::SpawnSystem::new(), "spawn_system", &[])
         .with(tower_def::tower::TowerSystem, "tower_sytem", &[])
         .with(tower_def::tower::MissleSystem, "missle_sytem", &[])
+        .with(tower_def::map::FontSystem::new(), "font_system", &[])
         .with(
             tower_def::tower::BuildPointSystem::new(),
             "build_point_system",

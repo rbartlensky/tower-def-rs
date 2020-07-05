@@ -141,10 +141,6 @@ impl TowerDefState {
             }
         }
         let paths = gather_paths(vec![start_coord.unwrap()], end_coord.unwrap(), &road_map);
-        world
-            .create_entity()
-            .with(Map::new(map, paths, sprite_sheet_handle.clone()))
-            .build();
         // create the text which lets you know how many resources you have left
         let font = world.read_resource::<Loader>().load(
             "font/square.ttf",
@@ -152,7 +148,7 @@ impl TowerDefState {
             (),
             &world.read_resource(),
         );
-        world
+        let gold_text = world
             .create_entity()
             .with(UiTransform::new(
                 "gold-text".to_string(),
@@ -167,8 +163,37 @@ impl TowerDefState {
             .with(UiText::new(
                 font.clone(),
                 "100 gold".to_string(),
-                [1., 1., 1., 1.],
+                [0., 1., 1., 1.],
                 50.,
+            ))
+            .build();
+        let error_text = world
+            .create_entity()
+            .with(UiTransform::new(
+                "error-text".to_string(),
+                Anchor::TopMiddle,
+                Anchor::TopMiddle,
+                50.,
+                -50.,
+                0.0,
+                550.,
+                50.,
+            ))
+            .with(UiText::new(
+                font.clone(),
+                "No errors.".to_string(),
+                [1., 0., 0., 0.],
+                50.,
+            ))
+            .build();
+        world
+            .create_entity()
+            .with(Map::new(
+                map,
+                paths,
+                sprite_sheet_handle.clone(),
+                gold_text,
+                error_text,
             ))
             .build();
     }

@@ -1,3 +1,4 @@
+use amethyst::assets::Handle;
 use amethyst::core::timing::Time;
 use amethyst::core::Transform;
 use amethyst::derive::SystemDesc;
@@ -8,6 +9,8 @@ use amethyst::input::{InputHandler, StringBindings};
 use amethyst::renderer::{Camera, SpriteRender};
 use amethyst::ui::UiText;
 use amethyst::window::ScreenDimensions;
+
+use std::collections::HashMap;
 
 use crate::tower::{utils, BuildPoint, Missle, Tower, TowerKind, MISSLE_SPEED};
 use crate::{map::Map, runner::Runner};
@@ -35,15 +38,15 @@ impl<'s> System<'s> for TowerSystem {
         let mut missle_comps = vec![];
         let time = time.delta_seconds();
         for (tower, t_trans) in (&mut towers, &transforms).join() {
-            tower.set_cd(tower.cd() + time);
+            tower.tick(time);
             for (_, r_trans, ent) in (&runners, &transforms, &entities).join() {
-                if utils::in_range(&t_trans, tower.radius(), &r_trans) && tower.cd() >= 1.0 {
+                if utils::in_range(&t_trans, tower.radius(), &r_trans) && tower.cd() <= 0. {
                     let debuff = tower.debuff();
                     missle_comps.push((
                         Missle::new(ent.id(), tower.damage(), debuff),
                         t_trans.clone(),
                     ));
-                    tower.set_cd(0.0);
+                    tower.reset_cd();
                 }
             }
         }
@@ -67,15 +70,129 @@ impl<'s> System<'s> for TowerSystem {
 pub struct BuildPointSystem {
     // currently selected build point
     selected: Option<Entity>,
-    buttons: Vec<(Entity, TowerKind)>,
+    selector: Vec<(Entity, TowerKind)>,
+    menus: HashMap<TowerKind, Vec<(Entity, TowerKind)>>,
+    shown: Vec<(Entity, TowerKind)>,
 }
 
 impl BuildPointSystem {
     pub fn new() -> Self {
         Self {
             selected: None,
-            buttons: vec![],
+            selector: Vec::with_capacity(2),
+            menus: Default::default(),
+            shown: vec![],
         }
+    }
+
+    fn maybe_init<'s>(
+        &mut self,
+        handle: Handle<amethyst::renderer::SpriteSheet>,
+        sprites: &mut WriteStorage<'s, SpriteRender>,
+        transforms: &mut WriteStorage<'s, Transform>,
+        entities: &Entities<'s>,
+    ) {
+        if self.selector.len() == 0 {
+            let mut tr = Transform::default();
+            // out of sight
+            tr.translation_mut().z = 2.0;
+            for tk in [TowerKind::Simple, TowerKind::Frost].iter() {
+                self.selector.push((
+                    entities
+                        .build_entity()
+                        .with(
+                            SpriteRender {
+                                sprite_sheet: handle.clone(),
+                                sprite_number: tk.sprite_number(),
+                            },
+                            sprites,
+                        )
+                        .with(tr.clone(), transforms)
+                        .build(),
+                    *tk,
+                ));
+            }
+        }
+    }
+
+    fn show_selector<'s>(
+        &mut self,
+        mut trans: Transform,
+        transforms: &mut WriteStorage<'s, Transform>,
+    ) {
+        self.hide_all(transforms);
+        trans.translation_mut().z = 0.5;
+        trans.translation_mut().y += 16.0;
+        trans.translation_mut().x -= 24.0;
+        for (button, tk) in &self.selector {
+            trans.translation_mut().x += 16.0;
+            *transforms.get_mut(button.clone()).unwrap() = trans.clone();
+            self.shown.push((button.clone(), *tk));
+        }
+    }
+
+    fn maybe_init_menu<'s>(
+        &mut self,
+        handle: Handle<amethyst::renderer::SpriteSheet>,
+        sprites: &mut WriteStorage<'s, SpriteRender>,
+        transforms: &mut WriteStorage<'s, Transform>,
+        entities: &Entities<'s>,
+    ) {
+        for tk in [TowerKind::Simple, TowerKind::Frost, TowerKind::Turret].iter() {
+            if !self.menus.contains_key(tk) {
+                let mut tr = Transform::default();
+                // out of sight
+                tr.translation_mut().z = 2.0;
+                self.menus.insert(
+                    *tk,
+                    tk.upgrades()
+                        .into_iter()
+                        .map(|tk| {
+                            (
+                                entities
+                                    .build_entity()
+                                    .with(
+                                        SpriteRender {
+                                            sprite_sheet: handle.clone(),
+                                            sprite_number: tk.sprite_number(),
+                                        },
+                                        sprites,
+                                    )
+                                    .with(tr.clone(), transforms)
+                                    .build(),
+                                tk,
+                            )
+                        })
+                        .collect(),
+                );
+            }
+        }
+    }
+
+    fn show_menu<'s>(
+        &mut self,
+        tk: TowerKind,
+        mut trans: Transform,
+        transforms: &mut WriteStorage<'s, Transform>,
+    ) {
+        self.hide_all(transforms);
+        trans.translation_mut().z = 0.5;
+        trans.translation_mut().y += 16.0;
+        trans.translation_mut().x -= 24.0;
+        for (button, tk) in &self.menus[&tk] {
+            trans.translation_mut().x += 16.0;
+            *transforms.get_mut(button.clone()).unwrap() = trans.clone();
+            self.shown.push((button.clone(), *tk));
+        }
+    }
+
+    fn hide_all<'s>(&mut self, transforms: &mut WriteStorage<'s, Transform>) {
+        // hide the menu
+        let _ = self
+            .shown
+            .drain(..)
+            .map(|(e, _)| transforms.get_mut(e).unwrap().translation_mut().z = 2.0)
+            .collect::<Vec<()>>();
     }
 }
 
@@ -89,7 +206,8 @@ impl<'s> System<'s> for BuildPointSystem {
         Entities<'s>,
         WriteStorage<'s, Tower>,
         WriteStorage<'s, SpriteRender>,
-        ReadStorage<'s, Map>,
+        WriteStorage<'s, Map>,
+        WriteStorage<'s, UiText>,
     );
 
     fn run(
@@ -103,76 +221,69 @@ impl<'s> System<'s> for BuildPointSystem {
             entities,
             mut towers,
             mut sprites,
-            map,
+            mut map,
+            mut texts,
         ): Self::SystemData,
     ) {
-        let map = (&map).join().next().unwrap();
+        let map = (&mut map).join().next().unwrap();
         let handle = map.sprite_sheet_handle();
-        // initialise our hidden buttons
-        if self.buttons.len() == 0 {
-            let mut tr = Transform::default();
-            // out of sight
-            tr.translation_mut().z = 2.0;
-            for tk in [TowerKind::Simple, TowerKind::Frost].iter() {
-                self.buttons.push((
-                    entities
-                        .build_entity()
-                        .with(
-                            SpriteRender {
-                                sprite_sheet: handle.clone(),
-                                sprite_number: tk.sprite_number(),
-                            },
-                            &mut sprites,
-                        )
-                        .with(tr.clone(), &mut transforms)
-                        .build(),
-                    *tk,
-                ));
-            }
-        }
+        // initialise our hidden buttons (if they're not already)
+        self.maybe_init(handle.clone(), &mut sprites, &mut transforms, &entities);
+        self.maybe_init_menu(handle.clone(), &mut sprites, &mut transforms, &entities);
+
         let (camera, camera_trans) = (&camera, &transforms).join().next().unwrap();
         if let Some(mouse_trans) = utils::mouse_position(&input, &dim, camera, camera_trans) {
-            let mut saved_trans = None;
             // check if we clicked on any build points
             for (ent, _, trans) in (&entities, &points, &transforms).join() {
                 if utils::in_range(trans, (map.tile_width() / 2) as f32, &mouse_trans) {
+                    // mark the build point as the currently selected one
                     self.selected = Some(ent);
-                    // save the trans
-                    saved_trans = Some(trans.clone());
-                    break;
+                    // show the selector
+                    self.show_selector(trans.clone(), &mut transforms);
+                    return;
                 }
             }
 
-            // we did click on a build point, this means we need to update
-            // where our tower selector is placed
-            if let Some(mut trans) = saved_trans {
-                trans.translation_mut().z = 0.5;
-                trans.translation_mut().y += 16.0;
-                trans.translation_mut().x -= 24.0;
-                for (button, _) in &self.buttons {
-                    trans.translation_mut().x += 16.0;
-                    *transforms.get_mut(button.clone()).unwrap() = trans.clone();
+            // check if we clicked on any towers
+            for (ent, tower, trans) in (&entities, &towers, &transforms).join() {
+                if utils::in_range(trans, (map.tile_width() / 2) as f32, &mouse_trans) {
+                    // mark the tower as the currently selected one
+                    self.selected = Some(ent);
+                    // show the tower upgrade menu
+                    self.show_menu(tower.kind(), trans.clone(), &mut transforms);
+                    return;
                 }
-                return;
             }
+
             let mut tower = None;
-            // did we click on a button?
-            for (button, tk) in &self.buttons {
+            // did we click on a button that is enabled?
+            for (button, tk) in &self.shown {
                 let trans = transforms.get_mut(button.clone()).unwrap();
                 if self.selected.is_some()
                     && tower.is_none()
                     && utils::in_range(trans, (map.tile_width() / 2) as f32, &mouse_trans)
                 {
-                    tower = Some(Tower::new(
-                        *tk,
-                        points.get(self.selected.clone().unwrap()).unwrap().pos(),
-                    ));
+                    if tk.cost() <= map.gold() {
+                        map.remove_gold(tk.cost());
+                        texts.get_mut(map.gold_text()).unwrap().text =
+                            format!("{} gold", map.gold());
+                        let pos = if let Some(point) = points.get(self.selected.clone().unwrap()) {
+                            point.pos()
+                        } else {
+                            // if it wasn't a build point, we must've upgraded a tower
+                            towers.get(self.selected.clone().unwrap()).unwrap().pos()
+                        };
+                        tower = Some(Tower::new(*tk, pos));
+                        // can't click on two buttons...
+                        break;
+                    } else {
+                        // we don't want to hide the menu selector!
+                        let error_text = texts.get_mut(map.error_text()).unwrap();
+                        error_text.text = format!("Not enough resources!");
+                        error_text.color[3] = 1.;
+                        return;
+                    }
                 }
-                // in any case, we will hide the button:
-                // * if we clicked on it, we will add a tower, therefore the
-                //   selector needs to be hidden
-                // * we didn't click on the button, therefore we need to hide it
-                trans.translation_mut().z = 2.0;
             }
             if let Some(tower) = tower {
                 let sprite = SpriteRender {
@@ -191,9 +302,11 @@ impl<'s> System<'s> for BuildPointSystem {
                     .with(tower, &mut towers)
                     .with(sprite, &mut sprites)
                     .build();
-                // remove the point
+                // remove the previous tower/build point
+                // XXX we could reuse the entity or some parts of it!
                 entities.delete(self.selected.take().unwrap()).unwrap();
             }
+            self.hide_all(&mut transforms);
             self.selected = None;
         }
     }
@@ -250,7 +363,7 @@ impl<'s> System<'s> for MissleSystem {
                     map.add_gold(runner.bounty());
                     entities.delete(target_ent).unwrap();
                     // update labels as well
-                    (&mut texts).join().next().unwrap().text = format!("{} gold", map.gold());
+                    texts.get_mut(map.gold_text()).unwrap().text = format!("{} gold", map.gold());
                 }
             } else {
                 norm.x *= time * MISSLE_SPEED;

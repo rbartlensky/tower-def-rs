@@ -1,4 +1,4 @@
-use amethyst::ecs::prelude::{Component, DenseVecStorage};
+use amethyst::ecs::prelude::{Component, DenseVecStorage, Entity};
 use amethyst::{assets::Handle, renderer::SpriteSheet};
 
 use crate::Coord;
@@ -8,6 +8,8 @@ pub struct Map {
     road: Vec<Vec<Coord>>,
     sprite_sheet_handle: Handle<SpriteSheet>,
     gold: usize,
+    gold_text: Entity,
+    error_text: Entity,
 }
 
 impl Map {
@@ -15,12 +17,16 @@ impl Map {
         tiled_map: tiled::Map,
         road: Vec<Vec<Coord>>,
         sprite_sheet_handle: Handle<SpriteSheet>,
+        gold_text: Entity,
+        error_text: Entity,
     ) -> Self {
         Self {
             tiled_map,
             road,
             sprite_sheet_handle,
             gold: 100,
+            gold_text,
+            error_text,
         }
     }
 
@@ -46,6 +52,18 @@ impl Map {
 
     pub fn add_gold(&mut self, gold: usize) {
         self.gold += gold;
+    }
+
+    pub fn remove_gold(&mut self, gold: usize) {
+        self.gold -= gold;
+    }
+
+    pub fn gold_text(&self) -> Entity {
+        self.gold_text.clone()
+    }
+
+    pub fn error_text(&self) -> Entity {
+        self.error_text.clone()
     }
 }
 

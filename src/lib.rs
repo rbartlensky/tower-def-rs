@@ -1,6 +1,6 @@
 use amethyst::core::transform::Transform;
 
-mod map;
+pub mod map;
 pub mod runner;
 pub mod states;
 pub mod tower;

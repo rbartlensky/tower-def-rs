@@ -1,5 +1,7 @@
 mod components;
+mod systems;
 pub use components::Map;
+pub use systems::FontSystem;
 
 use amethyst::{
     assets::{AssetStorage, Handle, Loader},

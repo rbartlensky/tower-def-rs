@@ -11,12 +11,13 @@ game engine.
 * Towers shoot on sight and deal damage (if a runner is hit twice, it dies)
 * Simple tower selector when you click on "X" tiles.
 * Debuffs (when frost tower hits enemy it is slowed down)
+* Tower upgrades
 
 ### To be implemented
 
 * Menus
 * Level selector
-* Tower upgrades + tower buffs
+* More towers
 * Smart runners (runners that do interesting stuff)
 
 ### To improve
