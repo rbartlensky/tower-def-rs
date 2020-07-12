@@ -1,12 +1,13 @@
 use amethyst::{
     assets::Loader,
     core::transform::Transform,
+    ecs::prelude::Entity,
     prelude::*,
     renderer::{Camera, SpriteRender},
-    ui::{Anchor, TtfFormat, UiText, UiTransform},
+    ui::*,
 };
 
-use std::collections::HashMap;
+use std::{collections::HashMap, path::PathBuf};
 
 use super::Coord;
 use crate::{
@@ -14,10 +15,28 @@ use crate::{
     tower::BuildPoint,
 };
 
+#[derive(Debug, PartialEq, Eq)]
+pub enum GameState {
+    MainMenu,
+    Game,
+}
+
+impl Default for GameState {
+    fn default() -> Self {
+        Self::MainMenu
+    }
+}
+
 #[derive(Default)]
-pub struct TowerDefState {}
+pub struct TowerDefState {
+    map: PathBuf,
+}
 
 impl TowerDefState {
+    pub fn new(map: PathBuf) -> Self {
+        Self { map }
+    }
+
     fn initialise_camera(&mut self, world: &mut World, map: &tiled::Map) {
         let mut transform = Transform::default();
         let width = (map.width * map.tile_width) as f32;
@@ -33,7 +52,7 @@ impl TowerDefState {
 
     fn load_map(&mut self, world: &mut World) {
         // parse the map
-        let map_file = std::fs::File::open("assets/tower-def.tmx").unwrap();
+        let map_file = std::fs::File::open(&self.map).unwrap();
         let reader = std::io::BufReader::new(map_file);
         let map = tiled::parse(reader).unwrap();
         let tile_set = map.get_tileset_by_gid(1).unwrap();
@@ -165,6 +184,8 @@ impl TowerDefState {
                 "100 gold".to_string(),
                 [0., 1., 1., 1.],
                 50.,
+                LineMode::Single,
+                Anchor::TopLeft,
             ))
             .build();
         let error_text = world
@@ -184,6 +205,8 @@ impl TowerDefState {
                 "No errors.".to_string(),
                 [1., 0., 0., 0.],
                 50.,
+                LineMode::Single,
+                Anchor::TopLeft,
             ))
             .build();
         world
@@ -202,6 +225,7 @@ impl TowerDefState {
 impl SimpleState for TowerDefState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
+        world.insert(GameState::Game);
         self.load_map(world);
     }
 }
@@ -249,4 +273,95 @@ fn gather_paths(path: Vec<Coord>, dest: Coord, map: &Vec<Vec<u8>>) -> Vec<Vec<Co
         }
     }
     final_paths
+}
+
+#[derive(Default)]
+pub struct MainMenuState {
+    levels: HashMap<Entity, std::path::PathBuf>,
+}
+
+impl MainMenuState {
+    pub fn new() -> Self {
+        Self {
+            levels: Default::default(),
+        }
+    }
+}
+
+impl SimpleState for MainMenuState {
+    fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
+        use std::fs;
+
+        let world = data.world;
+        let paths = fs::read_dir("assets/").unwrap();
+        let tmxs: Vec<std::path::PathBuf> = paths
+            .filter_map(|p| {
+                if p.is_err() {
+                    return None;
+                }
+                let p = p.unwrap().path();
+                if let Some(ext) = p.extension() {
+                    if ext == "tmx" {
+                        Some(p)
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                }
+            })
+            .collect();
+        // create a level button for each tmx map we find
+        // XXX: this doesn't handle if a row overflows...
+        for (i, path) in tmxs.into_iter().enumerate() {
+            let i = i + 1;
+            let (_, button) = UiButtonBuilder::<(), u32>::new(format!("{}", i))
+                .with_font_size(24.0)
+                .with_position(i as f32 * 32.0, -32.0)
+                .with_size(32.0, 32.0)
+                .with_image(UiImage::SolidColor([0.9, 0.9, 0.9, 1.]))
+                .with_anchor(Anchor::TopLeft)
+                .build_from_world(&world);
+            self.levels.insert(button.image_entity.clone(), path);
+        }
+    }
+
+    fn handle_event(
+        &mut self,
+        data: StateData<'_, GameData<'_, '_>>,
+        event: StateEvent,
+    ) -> SimpleTrans {
+        use amethyst::input::{is_close_requested, is_key_down};
+        use amethyst::winit::VirtualKeyCode;
+
+        data.world.insert(GameState::MainMenu);
+        match &event {
+            StateEvent::Window(event) => {
+                if is_close_requested(&event) || is_key_down(&event, VirtualKeyCode::Escape) {
+                    Trans::Quit
+                } else {
+                    Trans::None
+                }
+            }
+            StateEvent::Ui(ui_event) => {
+                if let UiEvent {
+                    event_type: UiEventType::Click,
+                    target,
+                } = ui_event
+                {
+                    // get the path to the map that we are loading
+                    let path = self.levels[&target].clone();
+                    // hide buttons by deleting them
+                    // XXX: is there a better way of doing this? Like a hide method?
+                    for (e, _) in self.levels.drain() {
+                        data.world.delete_entity(e).unwrap();
+                    }
+                    Trans::Switch(Box::new(TowerDefState::new(path)))
+                } else {
+                    Trans::None
+                }
+            }
+            _ => Trans::None,
+        }
+    }
 }

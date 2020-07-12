@@ -13,7 +13,7 @@ use amethyst::window::ScreenDimensions;
 use std::collections::HashMap;
 
 use crate::tower::{utils, BuildPoint, Missle, Tower, TowerKind, MISSLE_SPEED};
-use crate::{map::Map, runner::Runner};
+use crate::{map::Map, runner::Runner, GameState};
 
 #[derive(SystemDesc)]
 pub struct TowerSystem;
@@ -27,13 +27,17 @@ impl<'s> System<'s> for TowerSystem {
         WriteStorage<'s, Missle>,
         WriteStorage<'s, SpriteRender>,
         Read<'s, Time>,
+        Read<'s, GameState>,
         Entities<'s>,
     );
 
     fn run(
         &mut self,
-        (mut transforms, runners, mut towers, map, mut missles, mut sprites, time, entities): Self::SystemData,
+        (mut transforms, runners, mut towers, map, mut missles, mut sprites, time, state, entities): Self::SystemData,
     ) {
+        if *state != GameState::Game {
+            return;
+        }
         let map = (&map).join().next().unwrap();
         let mut missle_comps = vec![];
         let time = time.delta_seconds();
@@ -208,6 +212,7 @@ impl<'s> System<'s> for BuildPointSystem {
         WriteStorage<'s, SpriteRender>,
         WriteStorage<'s, Map>,
         WriteStorage<'s, UiText>,
+        Read<'s, GameState>,
     );
 
     fn run(
@@ -223,8 +228,12 @@ impl<'s> System<'s> for BuildPointSystem {
             mut sprites,
             mut map,
             mut texts,
+            state,
         ): Self::SystemData,
     ) {
+        if *state != GameState::Game {
+            return;
+        }
         let map = (&mut map).join().next().unwrap();
         let handle = map.sprite_sheet_handle();
         // initialise our hidden buttons (if they're not already)
@@ -323,13 +332,17 @@ impl<'s> System<'s> for MissleSystem {
         WriteStorage<'s, Missle>,
         Read<'s, Time>,
         WriteStorage<'s, UiText>,
+        Read<'s, GameState>,
         Entities<'s>,
     );
 
     fn run(
         &mut self,
-        (mut map, mut transforms, mut runners, mut missles, time, mut texts, entities): Self::SystemData,
+        (mut map, mut transforms, mut runners, mut missles, time, mut texts, state, entities): Self::SystemData,
     ) {
+        if *state != GameState::Game {
+            return;
+        }
         let map = (&mut map).join().next().unwrap();
         let time = time.delta_seconds();
         for (missle, ent) in (&mut missles, &entities).join() {

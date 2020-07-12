@@ -3,7 +3,7 @@ use amethyst::derive::SystemDesc;
 use amethyst::ecs::{Join, Read, ReadStorage, System, SystemData, WriteStorage};
 use amethyst::ui::UiText;
 
-use crate::map::Map;
+use crate::{GameState, map::Map};
 
 #[derive(SystemDesc)]
 pub struct FontSystem {
@@ -20,10 +20,14 @@ impl<'s> System<'s> for FontSystem {
     type SystemData = (
         ReadStorage<'s, Map>,
         Read<'s, Time>,
+        Read<'s, GameState>,
         WriteStorage<'s, UiText>,
     );
 
-    fn run(&mut self, (mut map, time, mut texts): Self::SystemData) {
+    fn run(&mut self, (mut map, time, state, mut texts): Self::SystemData) {
+        if *state != GameState::Game {
+            return;
+        }
         let map = (&mut map).join().next().unwrap();
         let time = time.delta_seconds();
         let error_text = texts.get_mut(map.error_text()).unwrap();

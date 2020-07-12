@@ -1,4 +1,4 @@
-use tower_def::TowerDefState;
+use tower_def::MainMenuState;
 
 use amethyst::{
     core::transform::TransformBundle,
@@ -48,7 +48,7 @@ fn main() -> amethyst::Result<()> {
                 .with_plugin(RenderUi::default()),
         )?;
 
-    let mut game = Application::new(assets_dir, TowerDefState {}, game_data)?;
+    let mut game = Application::new(assets_dir, MainMenuState::new(), game_data)?;
     game.run();
 
     Ok(())

@@ -3,7 +3,7 @@ use amethyst::core::Transform;
 use amethyst::derive::SystemDesc;
 use amethyst::ecs::{Entities, Join, Read, ReadStorage, System, SystemData, WriteStorage};
 
-use crate::{map::Map, runner::Runner, tower::utils};
+use crate::{GameState, map::Map, runner::Runner, tower::utils};
 use amethyst::renderer::SpriteRender;
 
 #[derive(SystemDesc)]
@@ -15,10 +15,14 @@ impl<'s> System<'s> for RunnerSystem {
         WriteStorage<'s, Runner>,
         ReadStorage<'s, Map>,
         Read<'s, Time>,
+        Read<'s, GameState>,
         Entities<'s>,
     );
 
-    fn run(&mut self, (mut transforms, mut runners, map, time, entities): Self::SystemData) {
+    fn run(&mut self, (mut transforms, mut runners, map, time, state, entities): Self::SystemData) {
+        if *state != GameState::Game {
+            return;
+        }
         let map = (&map).join().next().unwrap();
         let road = map.road();
         let time = time.delta_seconds();
@@ -64,13 +68,17 @@ impl<'s> System<'s> for SpawnSystem {
         WriteStorage<'s, Runner>,
         WriteStorage<'s, Transform>,
         WriteStorage<'s, SpriteRender>,
+        Read<'s, GameState>,
         Entities<'s>,
     );
 
     fn run(
         &mut self,
-        (map, time, mut runners, mut trans, mut sprites, entities): Self::SystemData,
+        (map, time, mut runners, mut trans, mut sprites, state, entities): Self::SystemData,
     ) {
+        if *state != GameState::Game {
+            return;
+        }
         let map = (&map).join().next().unwrap();
         let time = time.delta_seconds();
         self.spawn_timer += time;

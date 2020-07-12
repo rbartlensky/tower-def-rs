@@ -35,7 +35,7 @@ pub fn mouse_position(
         if let Some(m_pos) = input.mouse_position() {
             let screen_dimensions = Vector2::new(dim.width(), dim.height());
             let mouse_pos = Point3::new(m_pos.0, m_pos.1, 0.0);
-            let mouse_coords = camera.projection().screen_to_world_point(
+            let mouse_coords = camera.screen_to_world_point(
                 mouse_pos,
                 screen_dimensions,
                 &camera_trans,

@@ -5,7 +5,7 @@ authors = ["Robert Bartlensky"]
 edition = "2018"
 
 [dependencies]
-amethyst = "0.15.0"
+amethyst = { git = "https://github.com/amethyst/amethyst.git", revision = "335b7def48ac073ea0bb0fff781935d668faa737"}
 tiled = "0.9.2"
 rand = "0.7.3"
 

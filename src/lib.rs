@@ -4,7 +4,7 @@ pub mod map;
 pub mod runner;
 pub mod states;
 pub mod tower;
-pub use states::TowerDefState;
+pub use states::{GameState, MainMenuState, TowerDefState};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Coord {

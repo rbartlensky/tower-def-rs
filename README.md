@@ -12,11 +12,11 @@ game engine.
 * Simple tower selector when you click on "X" tiles.
 * Debuffs (when frost tower hits enemy it is slowed down)
 * Tower upgrades
+* Basic level selector
 
 ### To be implemented
 
 * Menus
-* Level selector
 * More towers
 * Smart runners (runners that do interesting stuff)
 
@@ -27,6 +27,7 @@ are wrong when I decide how much to append to the missle's transform)
 * Tower selector (very basic atm, would like to add some sort-of border around
 items in the selector)
 * Debuffs (maybe implementing a trait is better than having closures?)
+* Level selector
 
 
 ## Images
